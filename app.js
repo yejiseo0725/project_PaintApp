@@ -1,3 +1,8 @@
+const modeBtn = document.getElementById("mode-btn");
+const colorOptions = Array.from(
+  document.getElementsByClassName("color-option")
+);
+const color = document.getElementById("color");
 const lineWidth = document.getElementById("line-width");
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
@@ -6,6 +11,7 @@ canvas.height = 600;
 ctx.lineWidth = lineWidth.value;
 
 let isPainting = false;
+let isFilling = false;
 
 function onMove(event) {
   if (isPainting) {
@@ -31,31 +37,43 @@ function onLineWidthChange(event) {
   ctx.lineWidth = event.target.value;
 }
 
+function onColorChange(event) {
+  ctx.strokeStyle = event.target.value;
+  ctx.fillStyle = event.target.value;
+}
+
+function onColorClick(event) {
+  const colorValue = event.target.dataset.color;
+  ctx.strokeStyle = colorValue;
+  ctx.fillStyle = colorValue;
+  color.value = colorValue;
+}
+
+function onModeClick() {
+  if (isFilling) {
+    isFilling = false;
+    modeBtn.innerText = "Fill";
+  } else {
+    isFilling = true;
+    modeBtn.innerText = "Draw";
+  }
+}
+
+function onCanvasClick() {
+  if (isFilling) {
+    ctx.fillRect(0, 0, 800, 800);
+  }
+}
+
 canvas.addEventListener("mousemove", onMove);
 canvas.addEventListener("mousedown", startPainting);
 canvas.addEventListener("mouseup", cancelPainting);
 canvas.addEventListener("mouseleave", cancelPainting);
+canvas.addEventListener("click", onCanvasClick);
 
 lineWidth.addEventListener("change", onLineWidthChange);
+color.addEventListener("change", onColorChange);
 
-// const colors = [
-//   "#d63031",
-//   "#e17055",
-//   "#fdcb6e",
-//   "#00b894",
-//   "#00cec9",
-//   "#0984e3",
-//   "#6c5ce7",
-//   "#fd79a8",
-// ];
+colorOptions.forEach((color) => color.addEventListener("click", onColorClick));
 
-// function onClick(event) {
-//   ctx.beginPath();
-//   ctx.moveTo(0, 0);
-//   const color = colors[Math.floor(Math.random() * colors.length)];
-//   ctx.strokeStyle = color;
-//   ctx.lineTo(event.offsetX, event.offsetY);
-//   ctx.stroke();
-// }
-
-// canvas.addEventListener("mousemove", onClick);
+modeBtn.addEventListener("click", onModeClick);
